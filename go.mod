@@ -6,7 +6,7 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.23.3
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.15.0
 	github.com/stretchr/testify v1.12.1
-	go.temporal.io/api v1.63.5
+	go.temporal.io/api v1.64.0
 	go.temporal.io/sdk v1.50.0
 )
 
