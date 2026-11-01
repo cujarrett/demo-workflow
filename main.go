@@ -34,7 +34,7 @@ func run(ctx context.Context, logger *slog.Logger) error {
 	// The pod name. It survives a container restart, so a worker keeps its own queue after an unplug.
 	identity := envOr("HOSTNAME", "local")
 
-	tc, err := client.Dial(client.Options{
+	tc, err := dial(ctx, logger, client.Options{
 		HostPort:        envOr("TEMPORAL_ADDRESS", "localhost:7233"),
 		Namespace:       envOr("TEMPORAL_NAMESPACE", "default"),
 		Identity:        identity,
@@ -83,6 +83,24 @@ func run(ctx context.Context, logger *slog.Logger) error {
 
 	logger.Info("demo-workflow started", "worker", identity, "port", port)
 	return serve(ctx, port, (&api{temporal: tc, logger: logger}).routes())
+}
+
+// dial retries until Temporal accepts this worker.
+// In a new sandbox the token file and its Entra app take up to a minute to exist.
+// Exiting instead would pile up restarts, and slow every restart after an unplug.
+func dial(ctx context.Context, logger *slog.Logger, opts client.Options) (client.Client, error) {
+	for {
+		tc, err := client.Dial(opts)
+		if err == nil {
+			return tc, nil
+		}
+		logger.Warn("cannot reach Temporal yet, retrying", "error", err)
+		select {
+		case <-ctx.Done():
+			return nil, ctx.Err()
+		case <-time.After(3 * time.Second):
+		}
+	}
 }
 
 func serve(ctx context.Context, port string, h http.Handler) error {

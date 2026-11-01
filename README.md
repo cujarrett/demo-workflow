@@ -19,7 +19,7 @@ Every answer comes from the workflows, so either replica can serve any request.
 | `POST /orders` | Starts an order and returns its ID |
 | `GET /orders/{id}` | Steps, payments, the plain copy and the event history |
 | `POST /orders/{id}/unplug` | Stops the worker running the current step |
-| `GET /healthz` | Readiness probe |
+| `GET /healthz`, `GET /readyz` | Readiness probes. Both answer once the worker has connected |
 
 Workers are named by pod name.
 

@@ -30,7 +30,11 @@ type api struct {
 
 func (s *api) routes() http.Handler {
 	mux := http.NewServeMux()
-	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, _ *http.Request) { _, _ = w.Write([]byte("ok")) })
+	ok := func(w http.ResponseWriter, _ *http.Request) { _, _ = w.Write([]byte("ok")) }
+	mux.HandleFunc("GET /healthz", ok)
+	// Launchpad shows the sandbox as live once /readyz answers. The server starts only
+	// after the worker connects, so ready and healthy are the same here.
+	mux.HandleFunc("GET /readyz", ok)
 	mux.HandleFunc("POST /orders", s.startOrder)
 	mux.HandleFunc("GET /orders/{id}", s.getOrder)
 	mux.HandleFunc("POST /orders/{id}/unplug", s.unplug)
