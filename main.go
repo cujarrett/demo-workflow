@@ -85,7 +85,7 @@ func run(ctx context.Context, logger *slog.Logger) error {
 	return serve(ctx, port, (&api{temporal: tc, logger: logger}).routes())
 }
 
-// dial retries until Temporal accepts this worker.
+// dial retries every second until Temporal accepts this worker.
 // In a new sandbox the token file and its Entra app take up to a minute to exist.
 // Exiting instead would pile up restarts, and slow every restart after an unplug.
 func dial(ctx context.Context, logger *slog.Logger, opts client.Options) (client.Client, error) {
@@ -98,7 +98,7 @@ func dial(ctx context.Context, logger *slog.Logger, opts client.Options) (client
 		select {
 		case <-ctx.Done():
 			return nil, ctx.Err()
-		case <-time.After(3 * time.Second):
+		case <-time.After(time.Second):
 		}
 	}
 }
