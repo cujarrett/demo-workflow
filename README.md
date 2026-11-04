@@ -27,7 +27,7 @@ Workers are named by pod name.
 
 | Variable | Value |
 |---|---|
-| `TEMPORAL_ADDRESS`, `TEMPORAL_NAMESPACE`, `TEMPORAL_TOKEN_SCOPE` | Set by the platform from `workflowRef` |
+| `TEMPORAL_ADDRESS`, `TEMPORAL_NAMESPACE`, `TEMPORAL_TOKEN_SCOPE` | Set by the platform from `workflowSpaceRef` |
 | `PORT` | Default `8080` |
 
 ## Run it locally
