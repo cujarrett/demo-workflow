@@ -28,6 +28,7 @@ Workers are named by pod name.
 | Variable | Value |
 |---|---|
 | `TEMPORAL_ADDRESS`, `TEMPORAL_NAMESPACE`, `TEMPORAL_TOKEN_SCOPE` | Set by the platform from `workflowSpaceRef` |
+| `TEMPORAL_TLS_CERT`, `TEMPORAL_TLS_KEY` | Set by the platform on `public-cloud`. Paths to the client certificate and key, read on every new connection |
 | `PORT` | Default `8080` |
 
 ## Run it locally

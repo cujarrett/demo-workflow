@@ -39,7 +39,10 @@ func run(ctx context.Context, logger *slog.Logger) error {
 		Namespace:       envOr("TEMPORAL_NAMESPACE", "default"),
 		Identity:        identity,
 		HeadersProvider: newTokenHeaders(os.Getenv("TEMPORAL_TOKEN_SCOPE")),
-		Logger:          logger,
+		ConnectionOptions: client.ConnectionOptions{
+			TLS: newTLSConfig(os.Getenv("TEMPORAL_TLS_CERT"), os.Getenv("TEMPORAL_TLS_KEY")),
+		},
+		Logger: logger,
 	})
 	if err != nil {
 		return err
@@ -87,6 +90,7 @@ func run(ctx context.Context, logger *slog.Logger) error {
 
 // dial retries every second until Temporal accepts this worker.
 // In a new sandbox the token file and its Entra app take up to a minute to exist.
+// On public cloud the SVID files appear shortly after start.
 // Exiting instead would pile up restarts, and slow every restart after an unplug.
 func dial(ctx context.Context, logger *slog.Logger, opts client.Options) (client.Client, error) {
 	for {
