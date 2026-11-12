@@ -22,38 +22,18 @@ jobs:
         run: go vet ./...
 
   build-and-push:
-    runs-on: ubuntu-26.04-arm
     needs: test
     if: github.ref == 'refs/heads/main'
-
     permissions:
       contents: read
       packages: write
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
-
-      - name: Log in to GHCR
-        uses: docker/login-action@v4
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      # Sandboxes pull :latest, so a push to main reaches the next sandbox with no deploy step.
-      - name: Build and push
-        uses: docker/build-push-action@v7
-        with:
-          context: .
-          platforms: linux/arm64
-          sbom: true
-          push: true
-          tags: |
-            ghcr.io/cujarrett/demo-workflow:latest
-            ghcr.io/cujarrett/demo-workflow:sha-${{ github.sha }}
-          cache-from: type=gha,scope=demo-workflow
-          cache-to: type=gha,mode=max,scope=demo-workflow
+      id-token: write
+      attestations: write
+    # Sandboxes pull :latest, so a push to main reaches the next sandbox with no deploy step.
+    uses: cujarrett/homelab/.github/workflows/build-image.yml@main
+    with:
+      image: ghcr.io/cujarrett/demo-workflow
+      tags: |
+        ghcr.io/cujarrett/demo-workflow:latest
+        ghcr.io/cujarrett/demo-workflow:sha-${{ github.sha }}
+      cache-scope: demo-workflow
